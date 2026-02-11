@@ -358,3 +358,145 @@
     </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volkshygiene & Re-Migration Simulation 2025–2050 (mit BKA-Crime-Impact, 2014-2023)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1250px; margin: auto; }
+        .slider { width: 100%; margin: 10px 0; }
+        .output { font-weight: bold; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: #f2f2f2; }
+        .badge { padding: 5px 10px; border-radius: 5px; color: white; }
+        .stable { background: green; }
+        .boom { background: blue; }
+        .collapse { background: red; }
+        .risk { background: orange; }
+        .green { background: limegreen; }
+        #crimeSection { margin: 30px 0; padding: 15px; background: #ffebee; border: 2px solid #c62828; border-radius: 8px; }
+        canvas { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Volkshygiene & ethische Re-Migration Simulation 2025–2050</h1>
+        <p>Integriert Polygynie, Heterosis, Subsidien, Umwelt, Green Mobilisation – und jetzt auch den realen BKA-Crime-Impact (Mord, sexuelle Übergriffe, Körperverletzung). Re-Migration reduziert sowohl Umwelt- als auch Kriminalitätslast.</p>
+
+        <!-- Deine bisherigen Sliders bleiben unverändert -->
+        <!-- ... (alle deine <label> + <input type="range"> bleiben exakt gleich) ... -->
+
+        <button id="simulateBtn">Simulieren!</button>
+
+        <table id="resultTable"></table>
+
+        <!-- Neue Crime-Section -->
+        <div id="crimeSection">
+            <h2>BKA-Crime-Impact: Geschätzte migrant-verursachte Fälle (Nichtdeutsche)</h2>
+            <p>Basis 2023: Mord/Totschlag 1.131 (41 % Nichtdeutsche), Sexuelle Übergriffe 44.754 (34 %), Körperverletzung 1.282.529 (29 %). Skaliert mit Population + Re-Migration.</p>
+            <canvas id="crimeImpactChart" width="800" height="400"></canvas>
+        </div>
+
+        <!-- Deine bisherigen Charts -->
+        <canvas id="populationChart"></canvas>
+        <canvas id="iqHealthChart"></canvas>
+        <canvas id="envChart"></canvas>
+        <canvas id="waterChart"></canvas>
+        <canvas id="mobilisationChart"></canvas>
+
+        <div id="score" class="level"></div>
+        <button id="downloadBtn">Tabelle als CSV downloaden</button>
+
+        <!-- Rest deiner Biodiversitäts-Maps & Hinweise bleibt gleich -->
+
+    </div>
+
+    <script>
+        // === BKA-Daten (2023 als Basis) ===
+        const bka2023 = {
+            total: { murder: 1131, sexual: 44754, assault: 1282529 },
+            nonGermanShare: { murder: 0.41, sexual: 0.34, assault: 0.29 }
+        };
+
+        // Deine bisherigen Konstanten + Variablen bleiben gleich
+        const DEFAULTS = { /* ... wie gehabt ... */ };
+
+        let myChart, iqHealthChart, envChart, waterChart, mobilisationChart, crimeChart;
+
+        // === Neue Funktion: Crime-Berechnung ===
+        function calculateCrime(popArray, originShare, reMigRate) {
+            const migrantShare = (1 - originShare / 100) * (1 - reMigRate / 100); // Re-Mig reduziert migrant-Anteil
+            const basePop2023 = 83000000;
+            const crime = { murder: [], sexual: [], assault: [] };
+
+            popArray.forEach(pop => {
+                const scale = pop / basePop2023;
+                crime.murder.push(Math.round(bka2023.total.murder * bka2023.nonGermanShare.murder * migrantShare * scale));
+                crime.sexual.push(Math.round(bka2023.total.sexual * bka2023.nonGermanShare.sexual * migrantShare * scale));
+                crime.assault.push(Math.round(bka2023.total.assault * bka2023.nonGermanShare.assault * migrantShare * scale));
+            });
+            return crime;
+        }
+
+        // === Erweiterte calculateGrowth (Crime wird jetzt separat berechnet) ===
+        function calculateGrowth(...) { /* dein bisheriger Code bleibt gleich */ }
+
+        // === Neue renderCrimeChart ===
+        function renderCrimeChart(crimePrimo, gens) {
+            const labels = Array.from({length: gens+1}, (_, i) => i);
+            const ctx = document.getElementById('crimeImpactChart').getContext('2d');
+            if (crimeChart) crimeChart.destroy();
+            crimeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Mord/Totschlag (migrant-caused)', data: crimePrimo.murder, borderColor: '#d32f2f', fill: false },
+                        { label: 'Sexuelle Übergriffe', data: crimePrimo.sexual, borderColor: '#1976d2', fill: false },
+                        { label: 'Körperverletzung', data: crimePrimo.assault, borderColor: '#388e3c', fill: false }
+                    ]
+                },
+                options: {
+                    plugins: { title: { display: true, text: 'Projektierte migrant-verursachte Gewaltkriminalität' } },
+                    scales: { y: { beginAtZero: true } }
+                }
+            });
+        }
+
+        // === Erweiterte simulate() ===
+        function simulate() {
+            // ... dein bisheriger Code bis polyPrimo = ...
+
+            const crimePrimo = calculateCrime(polyPrimo.pop, 
+                parseFloat(document.getElementById('originShare').value), 
+                parseFloat(document.getElementById('reMig').value));
+
+            // Bestehende Aufrufe
+            buildTable(...);
+            renderCharts(...);
+            getScoreLevel(...);
+
+            // Neu
+            renderCrimeChart(crimePrimo, gens);
+
+            // Crime-Reduktion in Score anzeigen
+            const totalCrimeNow = crimePrimo.murder[gens] + crimePrimo.sexual[gens] + crimePrimo.assault[gens];
+            const totalCrimeNoReMig = bka2023.total.murder * bka2023.nonGermanShare.murder +
+                                      bka2023.total.sexual * bka2023.nonGermanShare.sexual +
+                                      bka2023.total.assault * bka2023.nonGermanShare.assault;
+            const reductionPercent = ((totalCrimeNoReMig - totalCrimeNow) / totalCrimeNoReMig * 100).toFixed(0);
+            document.getElementById('score').innerHTML += `<p style="color:#c62828;">→ Crime-Reduktion durch Re-Migration: <strong>${reductionPercent}%</strong> weniger Gewaltfälle bis 2050</p>`;
+        }
+
+        // initSliders() und alles andere bleibt gleich – nur simulate() wurde erweitert
+        initSliders();
+        updateCountryDefaults();
+    </script>
+</body>
+</html>
