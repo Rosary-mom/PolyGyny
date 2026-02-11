@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethische Re-Migration & nachhaltige Familienentwicklung Simulation 2025–2050</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 1250px; margin: auto; }
+        .slider { width: 100%; margin: 10px 0; }
+        .output { font-weight: bold; }
+        button { padding: 10px 20px; background: #4CAF50; color: white; border: none; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+        th { background: #f2f2f2; }
+        .badge { padding: 5px 10px; border-radius: 5px; color: white; }
+        .stable { background: green; }
+        .boom { background: blue; }
+        .collapse { background: red; }
+        .risk { background: orange; }
+        .green { background: limegreen; }
+        #crimeSection { margin: 30px 0; padding: 15px; background: #ffebee; border: 2px solid #c62828; border-radius: 8px; }
+        canvas { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Ethische Re-Migration & nachhaltige Familienentwicklung Simulation 2025–2050</h1>
+        <p>Vergleicht Monogamie vs. Polygynie, Heterosis-Effekte, familienfördernde Maßnahmen und Re-Migration als ethische Möglichkeit zur Bevölkerungsneutralität – inkl. realer BKA-Daten zur Kriminalität.</p>
+
+        <!-- Alle deine Sliders hier einfügen (unverändert) -->
+        <!-- ... (kopiere einfach alle <label> + <input type="range"> aus deiner alten Version) ... -->
+
+        <button id="simulateBtn">Simulieren!</button>
+
+        <table id="resultTable"></table>
+
+        <div id="crimeSection">
+            <h2>BKA-Crime-Impact: Geschätzte Fälle mit nichtdeutschen Tatverdächtigen</h2>
+            <p>Basis 2023: Mord/Totschlag 1.131 (41 %), sexuelle Übergriffe 44.754 (34 %), Körperverletzung 1.282.529 (29 %). Skaliert mit Bevölkerung + Re-Migration.</p>
+            <canvas id="crimeImpactChart" width="800" height="400"></canvas>
+        </div>
+
+        <canvas id="populationChart"></canvas>
+        <canvas id="iqHealthChart"></canvas>
+        <canvas id="envChart"></canvas>
+        <canvas id="waterChart"></canvas>
+        <canvas id="mobilisationChart"></canvas>
+
+        <div id="score" class="level"></div>
+        <button id="downloadBtn">Tabelle als CSV downloaden</button>
+    </div>
+
+    <script>
+        // === BKA-Daten 2023 ===
+        const bka2023 = {
+            total: { murder: 1131, sexual: 44754, assault: 1282529 },
+            nonGermanShare: { murder: 0.41, sexual: 0.34, assault: 0.29 }
+        };
+
+        // Deine bisherige calculateGrowth-Funktion + alle anderen Funktionen bleiben gleich
+        // (kopiere einfach den gesamten <script>-Inhalt aus deiner alten Version hierher)
+
+        // Nur die calculateCrime- und renderCrimeChart-Funktion + Anpassungen in simulate() wie in meiner letzten Version
+        // (ich habe sie dir bereits gegeben – einfach einfügen)
+
+        initSliders();
+        updateCountryDefaults();
+    </script>
+</body>
+</html>
