@@ -27,13 +27,75 @@
 <body>
     <div class="container">
         <h1>Ethische Re-Migration & nachhaltige Familienentwicklung Simulation 2025–2050</h1>
-        <p>Vergleicht Monogamie vs. Polygynie, Heterosis-Effekte, familienfördernde Maßnahmen und Re-Migration als ethische Möglichkeit zur Bevölkerungsneutralität – inkl. realer BKA-Daten zur Kriminalität.</p>
+        <p>Vergleicht Monogamie vs. Polygynie mit Heterosis-Effekten, familienfördernden Maßnahmen und Re-Migration als ethische Möglichkeit zur Bevölkerungsneutralität – inklusive realer BKA-Daten zur Kriminalität.</p>
 
-        <!-- Alle deine Sliders hier einfügen (unverändert) -->
-        <!-- ... (kopiere einfach alle <label> + <input type="range"> aus deiner alten Version) ... -->
+        <!-- Sliders -->
+        <label>Startpopulation: <span id="startPopVal">83000000</span></label>
+        <input type="range" class="slider" id="startPop" min="10000" max="500000000" value="83000000">
+
+        <label>Fertilität Monogamie: <span id="fertMonoVal">1.5</span></label>
+        <input type="range" class="slider" id="fertMono" min="1.0" max="3.0" step="0.1" value="1.5">
+
+        <label>Fertilität Poly: <span id="fertPolyVal">2.5</span></label>
+        <input type="range" class="slider" id="fertPoly" min="1.0" max="4.0" step="0.1" value="2.5">
+
+        <label>Adoption Basis (%): <span id="adoptBaseVal">5</span></label>
+        <input type="range" class="slider" id="adoptBase" min="0" max="20" value="5">
+
+        <label>Adoption Hoch (%): <span id="adoptHighVal">10</span></label>
+        <input type="range" class="slider" id="adoptHigh" min="0" max="20" value="10">
+
+        <label>Generationen: <span id="gensVal">10</span></label>
+        <input type="range" class="slider" id="gens" min="1" max="20" value="10">
+
+        <label>Künstliche Befruchtung Boost: <span id="aiFertVal">1.5</span></label>
+        <input type="range" class="slider" id="aiFert" min="1.0" max="2.0" step="0.1" value="1.5">
+
+        <label>Re-Migration Rate bis 2050 (% Reduktion): <span id="reMigVal">50</span></label>
+        <input type="range" class="slider" id="reMig" min="0" max="100" value="50">
+
+        <label>Inzucht-Reduktion (%): <span id="inzuchtRedVal">20</span></label>
+        <input type="range" class="slider" id="inzuchtRed" min="0" max="50" value="20">
+
+        <label>Heterosis-Boost: <span id="heterosisVal">1.2</span></label>
+        <input type="range" class="slider" id="heterosis" min="1.0" max="1.5" step="0.1" value="1.2">
+
+        <label>Subsidien-Boost (z.B. Riester): <span id="subsidyVal">1.2</span></label>
+        <input type="range" class="slider" id="subsidy" min="1.0" max="1.5" step="0.1" value="1.2">
+
+        <label>Polyandrie-Modus (0=Polygynie, 1=Polyandrie): <span id="polyandryVal">0</span></label>
+        <input type="range" class="slider" id="polyandry" min="0" max="1" step="1" value="0">
+
+        <label>Initialer Ursprungsanteil (%): <span id="originShareVal">70</span></label>
+        <input type="range" class="slider" id="originShare" min="50" max="90" value="70">
+
+        <label>CO2 per Capita (Tonnen/Jahr): <span id="co2PerCapVal">4.1</span></label>
+        <input type="range" class="slider" id="co2PerCap" min="1" max="20" step="0.1" value="4.1">
+
+        <label>Wasser per Capita (m³/Jahr): <span id="waterPerCapVal">1300</span></label>
+        <input type="range" class="slider" id="waterPerCap" min="500" max="10000" step="100" value="1300">
+
+        <label>E-Bike Anteil an Traffic (%): <span id="ebikeShareVal">30</span></label>
+        <input type="range" class="slider" id="ebikeShare" min="0" max="100" value="30">
+
+        <label>Walking Anteil an Traffic (%): <span id="walkingShareVal">20</span></label>
+        <input type="range" class="slider" id="walkingShare" min="0" max="100" value="20">
+
+        <label>Bus Anteil an Traffic (%): <span id="busShareVal">20</span></label>
+        <input type="range" class="slider" id="busShare" min="0" max="100" value="20">
+
+        <label>Wetter-Impact-Faktor (0.5=schlechtes Wetter reduziert Mobilisation): <span id="weatherImpactVal">0.8</span></label>
+        <input type="range" class="slider" id="weatherImpact" min="0.5" max="1.0" step="0.1" value="0.8">
+
+        <label>Land: </label>
+        <select id="country">
+            <option value="DE">Deutschland</option>
+            <option value="US">USA</option>
+            <option value="SE">Schweden</option>
+        </select>
 
         <button id="simulateBtn">Simulieren!</button>
-
+        
         <table id="resultTable"></table>
 
         <div id="crimeSection">
@@ -53,17 +115,197 @@
     </div>
 
     <script>
-        // === BKA-Daten 2023 ===
+        // === BKA 2023 Daten ===
         const bka2023 = {
             total: { murder: 1131, sexual: 44754, assault: 1282529 },
             nonGermanShare: { murder: 0.41, sexual: 0.34, assault: 0.29 }
         };
 
-        // Deine bisherige calculateGrowth-Funktion + alle anderen Funktionen bleiben gleich
-        // (kopiere einfach den gesamten <script>-Inhalt aus deiner alten Version hierher)
+        const DEFAULTS = {
+            startPop: 83000000, fertMono: 1.5, fertPoly: 2.5, adoptBase: 5, adoptHigh: 10,
+            gens: 10, aiFert: 1.5, reMig: 50, inzuchtRed: 20, heterosis: 1.2, subsidy: 1.2,
+            polyandry: 0, originShare: 70, co2PerCap: 4.1, waterPerCap: 1300,
+            ebikeShare: 30, walkingShare: 20, busShare: 20, weatherImpact: 0.8
+        };
 
-        // Nur die calculateCrime- und renderCrimeChart-Funktion + Anpassungen in simulate() wie in meiner letzten Version
-        // (ich habe sie dir bereits gegeben – einfach einfügen)
+        let myChart, iqHealthChart, envChart, waterChart, mobilisationChart, crimeChart;
+
+        function initSliders() {
+            document.querySelectorAll('.slider').forEach(slider => {
+                const valId = slider.id + 'Val';
+                const valSpan = document.getElementById(valId);
+                if (valSpan) valSpan.innerText = slider.value;
+                slider.addEventListener('input', () => valSpan.innerText = slider.value);
+            });
+            document.getElementById('country').addEventListener('change', updateCountryDefaults);
+            document.getElementById('simulateBtn').addEventListener('click', simulate);
+            document.getElementById('downloadBtn').addEventListener('click', downloadCSV);
+        }
+
+        function updateCountryDefaults() {
+            const c = document.getElementById('country').value;
+            if (c === 'US') {
+                document.getElementById('startPop').value = 340000000; document.getElementById('co2PerCap').value = 14.9;
+                document.getElementById('waterPerCap').value = 8844; document.getElementById('originShare').value = 59;
+            } else if (c === 'SE') {
+                document.getElementById('startPop').value = 10500000; document.getElementById('co2PerCap').value = 3.5;
+                document.getElementById('waterPerCap').value = 20000; document.getElementById('originShare').value = 80;
+            } else {
+                document.getElementById('startPop').value = 83000000; document.getElementById('co2PerCap').value = 4.1;
+                document.getElementById('waterPerCap').value = 1300; document.getElementById('originShare').value = 70;
+            }
+            document.querySelectorAll('.slider').forEach(s => {
+                const v = document.getElementById(s.id + 'Val');
+                if (v) v.innerText = s.value;
+            });
+        }
+
+        function calculateGrowth(startPop, fert, adopt, extra = 1) {
+            let pop = [startPop], iq = [100], health = [80], origin = [Math.round(startPop * (parseFloat(document.getElementById('originShare').value) / 100))];
+            let co2 = [startPop * parseFloat(document.getElementById('co2PerCap').value) / 1000000];
+            let water = [startPop * parseFloat(document.getElementById('waterPerCap').value) / 1000000];
+            let greenScore = [0];
+            const gens = parseInt(document.getElementById('gens').value);
+            const reMig = 1 - (parseFloat(document.getElementById('reMig').value) / 100);
+            const inzuchtRed = parseFloat(document.getElementById('inzuchtRed').value) / 100;
+            const heterosis = parseFloat(document.getElementById('heterosis').value);
+            const ebike = parseFloat(document.getElementById('ebikeShare').value) / 100;
+            const walking = parseFloat(document.getElementById('walkingShare').value) / 100;
+            const bus = parseFloat(document.getElementById('busShare').value) / 100;
+            const weather = parseFloat(document.getElementById('weatherImpact').value);
+
+            for (let g = 1; g <= gens; g++) {
+                let base = pop[g-1] * (fert / 2) * reMig;
+                let newPop = Math.round((base + base * adopt) * extra);
+                pop.push(newPop);
+                iq.push(iq[g-1] + (heterosis - 1) * 1 - (1 - inzuchtRed) * 0.5);
+                health.push(health[g-1] + inzuchtRed * 2);
+                origin.push(Math.round(origin[g-1] * (fert / 2) * extra * 0.99));
+                let envEff = (1 - inzuchtRed) * heterosis * reMig;
+                co2.push((newPop * parseFloat(document.getElementById('co2PerCap').value) / 1000000) * envEff);
+                water.push((newPop * parseFloat(document.getElementById('waterPerCap').value) / 1000000) * envEff);
+                let trafficShare = ebike + walking + bus;
+                greenScore.push(trafficShare * weather * reMig * 100);
+            }
+            return {pop, iq, health, origin, co2, water, greenScore};
+        }
+
+        function calculateCrime(popArray, originShare, reMigRate) {
+            const migrantShare = (1 - originShare / 100) * (1 - reMigRate / 100);
+            const basePop2023 = 83000000;
+            const crime = { murder: [], sexual: [], assault: [] };
+            popArray.forEach(pop => {
+                const scale = pop / basePop2023;
+                crime.murder.push(Math.round(bka2023.total.murder * bka2023.nonGermanShare.murder * migrantShare * scale));
+                crime.sexual.push(Math.round(bka2023.total.sexual * bka2023.nonGermanShare.sexual * migrantShare * scale));
+                crime.assault.push(Math.round(bka2023.total.assault * bka2023.nonGermanShare.assault * migrantShare * scale));
+            });
+            return crime;
+        }
+
+        function buildTable(mono, polyStd, polyPrimo, gens) {
+            let html = `<tr><th>Gen</th><th>Mono Pop</th><th>Mono IQ</th><th>Mono Health %</th><th>Mono CO2 (Mt)</th><th>Mono Wasser (Mio. m³)</th><th>Mono Green Score</th><th>Poly Std Pop</th><th>Poly Std IQ</th><th>Poly Std Health %</th><th>Poly Std CO2 (Mt)</th><th>Poly Std Wasser (Mio. m³)</th><th>Poly Std Green Score</th><th>Poly Primo Pop</th><th>Poly Primo IQ</th><th>Poly Primo Health %</th><th>Poly Primo CO2 (Mt)</th><th>Poly Primo Wasser (Mio. m³)</th><th>Poly Primo Green Score</th><th>Score</th></tr>`;
+            for (let g = 0; g <= gens; g++) {
+                let score = 'Stabil', badge = 'stable';
+                let growthRate = (polyPrimo.pop[g] / mono.pop[0]) * 100;
+                if (growthRate > 200) { score = 'Boom – optimiert!'; badge = 'boom'; }
+                if (growthRate < 100) { score = 'Kollaps'; badge = 'collapse'; }
+                if (polyPrimo.iq[g] < 100) { score += ' (Risiko)'; badge = 'risk'; }
+                html += `<tr><td>${g}</td><td>${mono.pop[g]}</td><td>${mono.iq[g]}</td><td>${mono.health[g]}</td><td>${mono.co2[g].toFixed(2)}</td><td>${mono.water[g].toFixed(2)}</td><td>${mono.greenScore[g].toFixed(2)}</td><td>${polyStd.pop[g]}</td><td>${polyStd.iq[g]}</td><td>${polyStd.health[g]}</td><td>${polyStd.co2[g].toFixed(2)}</td><td>${polyStd.water[g].toFixed(2)}</td><td>${polyStd.greenScore[g].toFixed(2)}</td><td>${polyPrimo.pop[g]}</td><td>${polyPrimo.iq[g]}</td><td>${polyPrimo.health[g]}</td><td>${polyPrimo.co2[g].toFixed(2)}</td><td>${polyPrimo.water[g].toFixed(2)}</td><td>${polyPrimo.greenScore[g].toFixed(2)}</td><td><span class="badge ${badge}">${score}</span></td></tr>`;
+            }
+            document.getElementById('resultTable').innerHTML = html;
+        }
+
+        function renderCharts(mono, polyStd, polyPrimo, gens) {
+            const labels = Array.from({length: gens+1}, (_, i) => i);
+            const render = (id, type, ds, chartVar) => {
+                const ctx = document.getElementById(id).getContext('2d');
+                if (chartVar) chartVar.destroy();
+                return new Chart(ctx, { type, data: { labels, datasets: ds }, options: { scales: { y: { beginAtZero: true } } } });
+            };
+            myChart = render('populationChart', 'line', [
+                { label: 'Monogamie', data: mono.pop, borderColor: 'green' },
+                { label: 'Poly Std', data: polyStd.pop, borderColor: 'blue' },
+                { label: 'Poly Primo & Re-Mig', data: polyPrimo.pop, borderColor: 'red' }
+            ], myChart);
+            iqHealthChart = render('iqHealthChart', 'line', [
+                { label: 'Primo IQ', data: polyPrimo.iq, borderColor: 'purple' },
+                { label: 'Primo Health %', data: polyPrimo.health, borderColor: 'orange' }
+            ], iqHealthChart);
+            envChart = render('envChart', 'line', [
+                { label: 'Mono CO2 (Mt)', data: mono.co2, borderColor: 'brown' },
+                { label: 'Poly Primo CO2 (Mt)', data: polyPrimo.co2, borderColor: 'green' }
+            ], envChart);
+            waterChart = render('waterChart', 'line', [
+                { label: 'Mono Wasser', data: mono.water, borderColor: 'blue' },
+                { label: 'Poly Primo Wasser', data: polyPrimo.water, borderColor: 'cyan' }
+            ], waterChart);
+            mobilisationChart = render('mobilisationChart', 'line', [
+                { label: 'Mono Green Score', data: mono.greenScore, borderColor: 'lime' },
+                { label: 'Poly Primo Green Score', data: polyPrimo.greenScore, borderColor: 'darkgreen' }
+            ], mobilisationChart);
+        }
+
+        function renderCrimeChart(crimePrimo, gens) {
+            const labels = Array.from({length: gens+1}, (_, i) => i);
+            const ctx = document.getElementById('crimeImpactChart').getContext('2d');
+            if (crimeChart) crimeChart.destroy();
+            crimeChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Mord/Totschlag', data: crimePrimo.murder, borderColor: '#d32f2f' },
+                        { label: 'Sexuelle Übergriffe', data: crimePrimo.sexual, borderColor: '#1976d2' },
+                        { label: 'Körperverletzung', data: crimePrimo.assault, borderColor: '#388e3c' }
+                    ]
+                },
+                options: { scales: { y: { beginAtZero: true } }, plugins: { title: { display: true, text: 'Projektierte Fälle mit nichtdeutschen Tatverdächtigen' } } }
+            });
+        }
+
+        function getScoreLevel(polyPrimo, startPop, reMig, polyStd) {
+            const gens = parseInt(document.getElementById('gens').value);
+            const level = reMig < 0.8 && polyPrimo.iq[gens] > 105 && polyPrimo.co2[gens] < polyStd.co2[gens] && polyPrimo.water[gens] < polyStd.water[gens] && polyPrimo.greenScore[gens] > 70 ? 'Optimierte, nachhaltige & stabile Zukunft' : 'Basis-Level';
+            document.getElementById('score').innerHTML = `<h3>${level}</h3>`;
+        }
+
+        function simulate() {
+            const startPop = parseInt(document.getElementById('startPop').value);
+            const fertMono = parseFloat(document.getElementById('fertMono').value);
+            const fertPoly = parseFloat(document.getElementById('fertPoly').value);
+            const adoptBase = parseFloat(document.getElementById('adoptBase').value) / 100;
+            const adoptHigh = parseFloat(document.getElementById('adoptHigh').value) / 100;
+            const gens = parseInt(document.getElementById('gens').value);
+            const aiFert = parseFloat(document.getElementById('aiFert').value);
+            const reMig = 1 - (parseFloat(document.getElementById('reMig').value) / 100);
+            const inzuchtRed = parseFloat(document.getElementById('inzuchtRed').value) / 100;
+            const heterosis = parseFloat(document.getElementById('heterosis').value);
+            const subsidy = parseFloat(document.getElementById('subsidy').value);
+            const polyandry = parseInt(document.getElementById('polyandry').value);
+            const polyFactor = polyandry ? 1.1 : 1.2;
+            const stabilityFactor = 1.3 * aiFert * subsidy * heterosis * (1 + inzuchtRed);
+
+            const mono = calculateGrowth(startPop, fertMono, adoptBase, 1);
+            const polyStd = calculateGrowth(startPop, fertPoly, adoptBase, 1 / polyFactor);
+            const polyPrimo = calculateGrowth(startPop, fertPoly, adoptHigh, stabilityFactor / polyFactor);
+
+            const crimePrimo = calculateCrime(polyPrimo.pop, parseFloat(document.getElementById('originShare').value), parseFloat(document.getElementById('reMig').value));
+
+            buildTable(mono, polyStd, polyPrimo, gens);
+            renderCharts(mono, polyStd, polyPrimo, gens);
+            renderCrimeChart(crimePrimo, gens);
+            getScoreLevel(polyPrimo, startPop, reMig, polyStd);
+        }
+
+        function downloadCSV() {
+            const rows = Array.from(document.querySelectorAll('#resultTable tr'));
+            let csv = rows.map(row => Array.from(row.cells).map(cell => cell.innerText).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = 'simulation.csv'; a.click();
+        }
 
         initSliders();
         updateCountryDefaults();
